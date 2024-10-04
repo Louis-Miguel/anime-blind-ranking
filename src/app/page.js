@@ -1,101 +1,115 @@
-import Image from "next/image";
+"use client"
+import React, { useState } from 'react';
+
+const items = [
+  { name: "Dere Characters", image: "/images/item1.jpg" },
+  { name: "Overpowered Protagonist", image: "/images/item2.jpg" },
+  { name: "Power of Friendship", image: "/images/item3.jpg" },
+  { name: "Tragic Anime Backstory", image: "/images/item4.jpg" },
+  { name: "Absent or Dead Parents", image: "/images/item5.jpg" },
+  { name: "Signature Attacks", image: "/images/item6.jpg" },
+  { name: "Tournament Arc", image: "/images/item8.jpg" },
+  { name: "Power-up", image: "/images/item9.jpg" },
+  { name: "Inner Monologue", image: "/images/item10.jpg" },
+  { name: "Transported to Another World", image: "/images/item11.jpg" },
+];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [ranking, setRanking] = useState(Array(5).fill(null)); 
+  const [remainingItems, setRemainingItems] = useState([...items]);
+  const [currentItem, setCurrentItem] = useState(null);
+  const [itemPulled, setItemPulled] = useState(false); 
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const pickRandomItem = () => {
+    if (remainingItems.length > 0) {
+      const randomIndex = Math.floor(Math.random() * remainingItems.length);
+      const selectedItem = remainingItems[randomIndex];
+      setCurrentItem(selectedItem);
+      setItemPulled(true); 
+    }
+  };
+
+  const rankItem = (position) => {
+    if (currentItem && ranking[position] === null) { 
+      const newRanking = [...ranking];
+      newRanking[position] = currentItem;
+      setRanking(newRanking);
+      setRemainingItems(remainingItems.filter(item => item !== currentItem));
+      setCurrentItem(null);
+      setItemPulled(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-800 flex flex-col items-center justify-center">
+      <h1 className="text-3xl font-bold mb-6 text-white">Anime Tropes Blind Ranking</h1>
+
+      {ranking.includes(null) ? (
+        <div className="w-1/3 bg-gray-700 p-6 rounded shadow-md"> 
+          <h2 className="text-xl font-semibold mb-4 text-white">Randomly Select an Item:</h2>
+          
+          {!itemPulled ? (
+            <button
+              onClick={pickRandomItem}
+              className="px-4 py-2 bg-[#4F8A8B] text-white rounded hover:bg-[#3C6E71] transition-all w-full mb-4"
+            >
+              Pull Random Item
+            </button>
+          ) : (
+            <div className="mb-4">
+              <div className="p-4 border-2 border-[#008087] rounded-lg text-white flex flex-col items-center">
+                <img src={currentItem.image} alt={currentItem.name} className="h-40 w-40 mb-2 rounded-lg object-cover" />
+                <span>{currentItem.name}</span>
+              </div>
+              <div className="flex justify-center space-x-4 mt-4">
+                {[1, 2, 3, 4, 5].map((rank, index) => (
+                  <button
+                    key={index}
+                    onClick={() => rankItem(index)} 
+                    className={`px-4 py-2 rounded 
+                      ${ranking[index] === null ? 'bg-[#4F8A8B] hover:bg-[#3C6E71] text-white' : 'bg-gray-500 text-gray-300 cursor-not-allowed'}
+                    `}
+                    disabled={ranking[index] !== null} 
+                  >
+                    {rank}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      ) : (
+        <div className="w-1/3 bg-gray-700 p-6 rounded shadow-md"> 
+          <h2 className="text-[40px] font-semibold mb-4 text-white text-center">Ranking Completed! Thank You For Listening!</h2>
+        </div>
+      )}
+
+      <div className="mt-8 w-1/2 bg-gray-700 p-6 rounded shadow-md">
+        <h2 className="text-xl font-semibold mb-4 text-white">Your Rankings:</h2>
+        <div className="grid grid-cols-5 gap-4 text-white">
+          {ranking.map((item, index) => (
+            <div key={index} className="flex flex-col items-center">
+              <span className="text-lg font-bold">{index + 1}</span>
+              <div className="border-2 border-[#008087] rounded-lg h-32 w-32 flex flex-col items-center justify-center relative">
+                {item ? (
+                  <img src={item.image} alt={item.name} className="h-full w-full object-cover rounded-lg" />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center">Empty</div>
+                )}
+              </div>
+              {item && <span className="text-xl mt-1 text-center">{item.name}</span>}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
+  
+
+
+
+
+
+
+
